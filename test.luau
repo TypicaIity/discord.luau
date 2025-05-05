@@ -2,7 +2,6 @@
 --!optimize 2
 
 local fs = (require)("@lune/fs")
-local task = (require)("@lune/task")
 local serde = (require)("@lune/serde")
 
 local discord = require("./discord.lua/init")
@@ -19,8 +18,7 @@ end)
 
 bot:on("MESSAGE_CREATE", function(message)
 	if message.author.bot then return end
-
-	print(message.__raw)
+	print(bot.cache.channels)
 end)
 
 bot:login(config.token)

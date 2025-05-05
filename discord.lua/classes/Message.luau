@@ -11,7 +11,7 @@ local User = require("./User")
 
 function Message.new(raw, token)
 	return setmetatable({
-		__raw = raw,
+		--__raw = raw,
 		__auth = token,
 
 		id = raw.id,
@@ -20,7 +20,10 @@ function Message.new(raw, token)
 		timestamp = raw.timestamp,
 		embeds = raw.embeds, -- TODO: wrap
 		attachments = raw.attachments, -- TODO: wrap
-		author = User.new(raw.author, token)
+		author = User.new(raw.author, token),
+		reference = raw.referenced_message and Message.new(raw.referenced_message, token),
+		pinned = raw.pinned,
+		mentions = raw.mentions, -- TODO: wrap
 	}, Message)
 end
 

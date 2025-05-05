@@ -6,14 +6,15 @@ User.__index = User
 
 function User.new(raw, token)
 	return setmetatable({
-		__raw = raw,
+		--__raw = raw,
 		__auth = token,
 
 		avatar = raw.avatar, -- TODO: wrap
-		discriminator = "0",
+		discriminator = raw.discriminator,
 		id = raw.id,
 		publicFlags = raw.public_flags,
-		name = raw.username
+		username = raw.username,
+		bot = if raw.bot == nil then false else raw.bot
 	}, User)
 end
 

@@ -24,9 +24,14 @@ if isLune then
 			self.OnMessage = {}
 			function self.OnMessage:Connect(cb)
 				libs.task.spawn(function()
-					while true do 
+					while true do
 						local message = ws:next()
-						cb(message)
+						if message then
+							cb(message)
+						else
+							print("WebSocket connection closed.")
+							break
+						end
 					end
 				end)
 			end

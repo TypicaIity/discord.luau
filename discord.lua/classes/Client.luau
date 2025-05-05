@@ -8,6 +8,8 @@ local api = require("../API")
 local util = require("../util")
 local comp = require("../compatability")
 
+local User = require("./User")
+local Guild = require("./Guild")
 local Message = require("./Message")
 
 export type ClientConfig = {
@@ -18,6 +20,18 @@ export type ClientConfig = {
 local PROCESSORS = {
 	MESSAGE_CREATE = function(self, data: { [string]: any }): any
 		return Message.new(data, self.__auth)
+	end,
+	READY = function(self, data: { [string]: any }): any
+		self.user = User.new(data.user, self.__auth)
+		return nil
+	end,
+	GUILD_CREATE = function(self, data: { [string]: any }): any
+		local guild = Guild.new(data, self.__auth)
+		for _, chan in guild.channels do
+			self.cache.channels[chan.id] = chan
+		end
+		self.cache.guilds[data.id] = guild
+		return guild
 	end
 }
 
@@ -25,15 +39,23 @@ function Client.new(config: ClientConfig)
 	-- TODO: type check config
 	return setmetatable({
 		__auth = nil,
-		__config = config,
-		__handlers = {},
-		intents = config.intents or 53608447
+		__config = {
+			selfbot = if config.selfbot == nil then false else config.selfbot,
+			intents = if config.intents == nil then 53608447 else config.intents
+		},
+		__handlers = {}
 	}, Client)
 end
 
 function Client:login(token: string)
 	util.tce(1, token, "string")
+
 	self.__auth = `{if self.__config.selfbot == true then "" else "Bot "}{token}`
+	self.cache = {
+		channels = setmetatable({}, { __mode = "v" }),
+		guilds = setmetatable({}, { __mode = "v" }),
+		users = setmetatable({}, { __mode = "v" })
+	}
 
 	local heartbeat = {
 		interval = 0,
@@ -56,7 +78,7 @@ function Client:login(token: string)
 				op = 2,
 				d = {
 					token = self.__auth,
-					intents = self.intents,
+					intents = self.__config.intents,
 					properties = {
 						os = "linux",
 						browser = "discord",
@@ -76,14 +98,12 @@ function Client:login(token: string)
 
 		if not ev then return end
 
-		if ev == "READY" then
-			self.user = data.user
-		end
+		local p = PROCESSORS[ev]
+		if p then data = p(self, data) end
 
-		if self.__handlers[ev] then
-			local p = PROCESSORS[ev]
-			if p then data = p(self, data) end
-			self.__handlers[ev](data)
+		local h = self.__handlers[ev]
+		if h then
+			h(data)
 		end
 	end)
 end
