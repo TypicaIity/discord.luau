@@ -10,6 +10,7 @@ local comp = require("../compatability")
 local User = require("./User")
 
 function Message.new(raw, token)
+	print(raw)
 	return setmetatable({
 		--__raw = raw,
 		__auth = token,
@@ -21,9 +22,10 @@ function Message.new(raw, token)
 		embeds = raw.embeds, -- TODO: wrap
 		attachments = raw.attachments, -- TODO: wrap
 		author = User.new(raw.author, token),
-		reference = raw.referenced_message and Message.new(raw.referenced_message, token),
+		reference = (raw.referenced_message and Message.new(raw.referenced_message, token)) or raw.message_reference,
 		pinned = raw.pinned,
 		mentions = raw.mentions, -- TODO: wrap
+		guildId = raw.guild_id
 	}, Message)
 end
 

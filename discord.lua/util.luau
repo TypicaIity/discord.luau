@@ -3,8 +3,9 @@
 
 local util = {}
 
-function util.tce(n, a, e)
+function util.tca<T>(n: number, a: T, e: string): T
 	assert(typeof(a) == e, `invalid argument #{n} to '{debug.info(2, "n")}' ({typeof(a)} expected, got {e})`, 2)
+	return a
 end
 
 function util.headers(token)

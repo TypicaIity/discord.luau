@@ -6,19 +6,20 @@ local serde = (require)("@lune/serde")
 
 local discord = require("./discord.lua/init")
 
-local bot = discord.Client({
-	selfbot = false
+local client = discord.Client({
+	selfclient = false
 }) :: any
 
 local config = serde.decode("json", fs.readFile("config.json"))
 
-bot:on("READY", function()
-	print(`logged in as {bot.user.username}`)
+client:on("READY", function()
+	print(`logged in as {client.user.username}`)
 end)
 
-bot:on("MESSAGE_CREATE", function(message)
-	if message.author.bot then return end
-	print(bot.cache.channels)
+client:on("MESSAGE_CREATE", function(message)
+	if message.author.client then return end
+	
+	print(client.cache.guilds[message.guildId])
 end)
 
-bot:login(config.token)
+client:login(config.token)
