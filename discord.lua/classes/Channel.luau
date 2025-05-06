@@ -11,6 +11,7 @@ local Channel = {
 Channel.__index = Channel
 
 local api = require("../API")
+local Message = require("./Message")
 
 function Channel.new(raw, token)
 	return setmetatable({
@@ -31,9 +32,17 @@ function Channel.new(raw, token)
 end
 
 function Channel:send(message: string)
-	api:POST(`channels/{self.id}/messages`, self.__auth, {
+	return Message.new(api:POST(`channels/{self.id}/messages`, self.__auth, {
 		content = message
-	})
+	}))
+end
+
+function Channel:fetchMessages(limit: number?)
+	local wrapped = {}
+	for i, raw in api:GET(`channels/{self.id}/messages{if limit then "?limit="..tostring(limit) else ""}`, self.__auth) do
+		wrapped[i] = Message.new(raw, self.__auth)
+	end
+	return wrapped
 end
 
 return Channel

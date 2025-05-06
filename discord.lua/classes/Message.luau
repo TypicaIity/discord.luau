@@ -10,7 +10,6 @@ local comp = require("../compatability")
 local User = require("./User")
 
 function Message.new(raw, token)
-	print(raw)
 	return setmetatable({
 		--__raw = raw,
 		__auth = token,

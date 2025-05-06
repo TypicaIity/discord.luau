@@ -1,9 +1,12 @@
-local User = require("User") -- assuming User class is in a separate file
+--!strict
+--!optimize 2
 
 local Member = {}
 Member.__index = Member
 
-function Member.new(raw, guildId, token)
+local User = require("./User")
+
+function Member.new(raw, token)
 	local user = raw.user and User.new(raw.user, token)
 	
 	return setmetatable({
@@ -21,8 +24,7 @@ function Member.new(raw, guildId, token)
 		pending = raw.pending,
 		permissions = raw.permissions,
 		communicationDisabledUntil = raw.communication_disabled_until,
-		flags = raw.flags,
-		guildId = guildId
+		flags = raw.flags
 	}, Member)
 end
 

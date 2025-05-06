@@ -14,8 +14,8 @@ function api:POST(endpoint, token, body)
 	return comp.httppost(self.REST:format(self.Version, endpoint), util.headers(token), body)
 end
 
-function api:PUT(endpoint, token)
-	return comp.httpput(self.REST:format(self.Version, endpoint), util.headers(token))
+function api:PUT(endpoint, token, body: { [string]: any }?)
+	return comp.httpput(self.REST:format(self.Version, endpoint), util.headers(token), body)
 end
 
 function api:PATCH(endpoint, token, body)

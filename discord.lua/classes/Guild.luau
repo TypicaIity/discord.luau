@@ -4,12 +4,19 @@
 local Guild = {}
 Guild.__index = Guild
 
+local api = require("../API")
+
+local Member = require("./Member")
 local Channel = require("./Channel")
 
 function Guild.new(raw, token)
 	local channels = {}
 	for i, channel in raw.channels do
 		channels[i] = Channel.new(channel, token)
+	end
+	local members = {}
+	for i, member in raw.members do
+		members[i] = Member.new(member, token)
 	end
 	return setmetatable({
 		--__raw = raw,
@@ -26,7 +33,7 @@ function Guild.new(raw, token)
 		lazy = raw.lazy,
 		maxMembers = raw.max_members,
 		memberCount = raw.member_count,
-		members = raw.members, -- TODO: wrap
+		members = members,
 		name = raw.name,
 		nsfw = raw.nsfw,
 		nsfwLevel = raw.nsfw_level,
@@ -39,6 +46,14 @@ function Guild.new(raw, token)
 		verification = raw.verification_level,
 		version = raw.version
 	}, Guild)
+end
+
+function Guild:fetchMember(id: string)
+	return Member.new(api:GET(`guilds/{self.id}/members/{id}`, self.__auth), self.__auth)
+end
+
+function Guild:ban(id: string)
+	return api:PUT(`guilds/{self.id}/bans/{id}`, self.__auth).message
 end
 
 return Guild

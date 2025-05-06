@@ -67,11 +67,12 @@ if isLune then
 		}).body)
 	end
 
-	function comp.httpput(url, headers)
+	function comp.httpput(url, headers, body: { [string]: any }?)
 		return comp.jsondecode(libs.net.request({
 			url = url,
 			method = "PUT",
-			headers = headers
+			headers = headers,
+			body = body or "{}"
 		}).body)
 	end
 

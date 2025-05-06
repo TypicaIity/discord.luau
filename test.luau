@@ -19,7 +19,7 @@ end)
 client:on("MESSAGE_CREATE", function(message)
 	if message.author.client then return end
 	
-	print(client.cache.guilds[message.guildId])
+	print(client.cache.channels["1092181486217728173"]:fetchMessages(5))
 end)
 
 client:login(config.token)

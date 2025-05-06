@@ -18,8 +18,10 @@ export type ClientConfig = {
 }
 
 local PROCESSORS = {
-	MESSAGE_CREATE = function(self, data: { [string]: any }): any
-		return Message.new(data, self.__auth)
+	MESSAGE_CREATE = function(self, data: { [string]: any }): Message
+		local message = Message.new(data, self.__auth) :: any
+		message.guild = self.cache.guilds[message.guildId]
+		return message
 	end,
 	READY = function(self, data: { [string]: any }): any
 		self.user = User.new(data.user, self.__auth)
@@ -39,7 +41,7 @@ local OP_HEARTBEAT	= 1
 local OP_IDENTIFY	= 2
 local OP_HELLO		= 10
 
-local function checkconfig(config: ClientConfig)
+local function checkconfig(config: ClientConfig): ()
 	assert(type(config.selfbot) == "boolean" or config.selfbot == nil, `invalid configuration to '{debug.info(2, "n")}' (.selfbot must be a boolean or nil)`)
 	assert(type(config.intents) == "number" or config.intents == nil, `invalid configuration to '{debug.info(2, "n")}' (.intents must be a number or nil)`)
 	config.selfbot = if config.selfbot == nil then false else config.selfbot
@@ -59,7 +61,7 @@ function Client.new(config: ClientConfig)
 	}, Client)
 end
 
-function Client:login(token: string)
+function Client:login(token: string): ()
 	util.tca(1, token, "string")
 
 	self.__auth = `{if self.__config.selfbot == true then "" else "Bot "}{token}`
@@ -141,7 +143,7 @@ function Client:login(token: string)
 	end)
 end
 
-function Client:on(event: string, callback: (...any) -> ())
+function Client:on(event: string, callback: (...any) -> ()): ()
 	util.tca(1, event, "string")
 	util.tca(2, callback, "function")
 	self.__handlers[event] = callback
